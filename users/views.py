@@ -67,7 +67,7 @@ class SigninView(View):
             if not bcrypt.checkpw(password.encode('utf-8'), User.objects.get(email=data['email']).password.encode('utf-8')):
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
             token  = jwt.encode({'email':email}, SECRET_KEY, ALGORITHM)
-            #token = jwt.encode({'email':email}, SECRET_KEY, ALGORITHM)
+            
             
             return JsonResponse({"access_token":token},status=201)
         

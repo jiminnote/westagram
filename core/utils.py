@@ -17,8 +17,6 @@ def Signin_decorator(func):
             request.user = user
             return func(self, request, *args, **kwargs)
             
-  
-
         except User.DoesNotExist: # User 테이블에 매치되는 값이 없을 때
             return JsonResponse({'message': 'USER_DOES_NOT_EXIST_ERROR'}, status=400)
             
