@@ -14,7 +14,9 @@ from users.models     import User
 
 class SignupView(View): 
     def post(self,request):
+        
         try:
+            
             data      = json.loads(request.body)   
             email     = data['email'] 
             nick_name = data["nick_name"] 
@@ -37,23 +39,23 @@ class SignupView(View):
                     password     = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
                     phone_number = data["phone_number"],
             )
-            # signup_user = User(
-            #     email    = data['email'],
-            #     password = data['password'],
-            #     first_name = data['first_name'],
-            #     last_name=['last_name'],
-            #     phone_number=['phone_number'],
-            # )
-            # signup_user.full_clean()
             
+            signup_user = User(
+                email    = data['email'],
+                password = data['password'],
+                first_name = data['first_name'],
+                last_name=['last_name'],
+                phone_number=['phone_number'],
+            )
+            signup_user.full_clean()
             return JsonResponse({"message":"SUCCESS"}, status=200)
-        
+       
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
-        
         except ValidationError as e :
-            return JsonResponse({'message' : e.message})
-    
+            return JsonResponse({'message' : list(e.message_dict.values())})
+        
+            
     def get(self, request):
         return JsonResponse({'results':list(User.objects.values())},status=200)
     
@@ -67,7 +69,7 @@ class SigninView(View):
             if not bcrypt.checkpw(password.encode('utf-8'), User.objects.get(email=data['email']).password.encode('utf-8')):
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
             token  = jwt.encode({'email':email}, SECRET_KEY, ALGORITHM)
-            #token = jwt.encode({'email':email}, SECRET_KEY, ALGORITHM)
+            
             
             return JsonResponse({"access_token":token},status=201)
         
