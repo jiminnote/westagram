@@ -29,7 +29,16 @@ class SignupView(View):
             if User.objects.filter(nick_name = nick_name).exists():
              return JsonResponse({"message":"DUPLICATE_NICK_NAME"}, status=400)
             
-            
+            signup_user = User(
+                email    = data['email'],
+                password = data['password'],
+                first_name = data['first_name'],
+                last_name=data['last_name'],
+                nick_name=data['nick_name'],
+                phone_number=data['phone_number'],
+                
+            )
+            signup_user.full_clean()
             User.objects.create(
                 
                     first_name   = data["first_name"],
@@ -40,20 +49,13 @@ class SignupView(View):
                     phone_number = data["phone_number"],
             )
             
-            signup_user = User(
-                email    = data['email'],
-                password = data['password'],
-                first_name = data['first_name'],
-                last_name=['last_name'],
-                phone_number=['phone_number'],
-            )
-            signup_user.full_clean()
+            
             return JsonResponse({"message":"SUCCESS"}, status=200)
        
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
         except ValidationError as e :
-            return JsonResponse({'message' : list(e.message_dict.values())})
+            return JsonResponse({'message' : list(e.message_dict.values())}, status=400)
         
             
     def get(self, request):
